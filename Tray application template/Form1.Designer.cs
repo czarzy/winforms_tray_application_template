@@ -31,6 +31,8 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(main_window));
             this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.infoTextbox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // trayIcon
@@ -42,21 +44,44 @@
             this.trayIcon.Text = "Tray App Template";
             this.trayIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TrayIcon_MouseDoubleClick);
             // 
+            // infoTextbox
+            // 
+            this.infoTextbox.Location = new System.Drawing.Point(13, 47);
+            this.infoTextbox.Name = "infoTextbox";
+            this.infoTextbox.ReadOnly = true;
+            this.infoTextbox.Size = new System.Drawing.Size(288, 20);
+            this.infoTextbox.TabIndex = 0;
+            this.infoTextbox.Text = "No informations.";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 28);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(25, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Info";
+            // 
             // main_window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(313, 257);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.infoTextbox);
             this.Name = "main_window";
             this.Text = "Tray application";
             this.Resize += new System.EventHandler(this.main_window_Resize);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.NotifyIcon trayIcon;
+        private System.Windows.Forms.TextBox infoTextbox;
+        private System.Windows.Forms.Label label1;
     }
 }
 

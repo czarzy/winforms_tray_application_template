@@ -1,13 +1,21 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Tray_application_template
 {
     public partial class main_window : Form
     {
-        public main_window()
+        private Thread BackgroundThread { get; set; }
+        public main_window(Thread backgroundThread)
         {
+            this.BackgroundThread = backgroundThread;
             InitializeComponent();
+            BackgroundThread.Start();
+            if(this.BackgroundThread.IsAlive)
+            {
+                infoTextbox.Text = "Background thread started.";
+            }
         }
 
         private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
