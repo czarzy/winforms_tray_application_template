@@ -13,6 +13,7 @@ namespace Tray_application_template
         public int port { get; set; }
         public static Socket Listener { get; set; } = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         static private string guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+        static ManualResetEvent allDone = new ManualResetEvent(false);
 
         public SocketService(int port)
         {
@@ -24,12 +25,17 @@ namespace Tray_application_template
             IPEndPoint local = new IPEndPoint(IPAddress.Loopback, port);
             Listener.Bind(local);
             Listener.Listen(10);
-
-            Listener.BeginAccept(null, 0, OnAccept, null);
+            while(true)
+            {
+                allDone.Reset();
+                Listener.BeginAccept(null, 0, OnAccept, null);
+                allDone.WaitOne();
+            }
         }
 
         private static void OnAccept(IAsyncResult result)
         {
+            allDone.Set();
             byte[] buffer = new byte[1024];
             try
             {
@@ -48,7 +54,6 @@ namespace Tray_application_template
                     byte[] swkaSha1 = SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(swka));
                     string swkaSha1Base64 = Convert.ToBase64String(swkaSha1);
 
-                    // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
                     byte[] response = Encoding.UTF8.GetBytes(
                         "HTTP/1.1 101 Switching Protocols\r\n" +
                         "Connection: Upgrade\r\n" +
@@ -58,25 +63,15 @@ namespace Tray_application_template
                     client.Send(response);
 
                     var i = client.Receive(buffer);
-                    string browserSent = GetDecodedData(buffer, i);
-                    Console.WriteLine("BrowserSent: " + browserSent);
-
-                    Console.WriteLine("=====================");
+                    string clientMessage = GetDecodedData(buffer, i);
                     //now send message to client
-                    client.Send(GetFrameFromString("Websocket works."));
-                    Thread.Sleep(10000);
+                    client.Send(GetFrameFromString(clientMessage));
+                    Thread.Sleep(1000);
                 }
             }
             catch (SocketException exception)
             {
                 throw exception;
-            }
-            finally
-            {
-                if (Listener != null && Listener.IsBound)
-                {
-                    Listener.BeginAccept(null, 0, OnAccept, null);
-                }
             }
         }
         public static string GetDecodedData(byte[] buffer, int length)
@@ -135,12 +130,6 @@ namespace Tray_application_template
 
             /* Denotes a closed connection */
             ClosedConnection = 8,
-
-            /* Denotes a ping*/
-            Ping = 9,
-
-            /* Denotes a pong */
-            Pong = 10
         }
 
         public static byte[] GetFrameFromString(string Message, EOpcodeType Opcode = EOpcodeType.Text)
@@ -199,13 +188,6 @@ namespace Tray_application_template
             }
 
             return response;
-        }
-
-        public static T[] SubArray<T>(T[] data, int index, int length)
-        {
-            T[] result = new T[length];
-            Array.Copy(data, index, result, 0, length);
-            return result;
         }
     }
 }
