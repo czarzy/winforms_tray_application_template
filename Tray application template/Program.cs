@@ -20,7 +20,7 @@ namespace Tray_application_template
 
         private static void OnLoad(object sender, EventArgs e)
         {
-            IService service = new Service();
+            ISocketService service = new SocketService(9999);
             service.CreateServer();
         }
     }

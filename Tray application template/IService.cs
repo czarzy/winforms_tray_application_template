@@ -1,7 +1,10 @@
-﻿namespace Tray_application_template
+﻿using System.Net.Sockets;
+
+namespace Tray_application_template
 {
-    interface IService
+    interface ISocketService
     {
+        int port { get; set; }
         void CreateServer();
     }
 }
